@@ -1,7 +1,7 @@
 const db = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { successResponse } = require("../utils/response");
+const { successResponse, errorResponse } = require("../utils/response");
 
 const signup = async (req, res, next) => {
   try {
@@ -14,9 +14,7 @@ const signup = async (req, res, next) => {
     );
 
     if (existingUser.length > 0) {
-      return res.status(409).json({
-        message: "Email already registered",
-      });
+      return errorResponse(res, 409, "Email already registered");
     }
 
     // 3. Hash password
@@ -52,9 +50,7 @@ const login = async (req, res, next) => {
 
     // 3. User not found
     if (users.length === 0) {
-      return res.status(404).json({
-        message: "User not found",
-      });
+      return errorResponse(res, 404, "User not found");
     }
 
     const user = users[0];
@@ -63,9 +59,7 @@ const login = async (req, res, next) => {
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({
-        message: "Invalid password",
-      });
+      return errorResponse(res, 401, "Invalid password");
     }
 
     // 5. Generate JWT Token
