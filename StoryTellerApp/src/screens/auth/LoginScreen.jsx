@@ -12,29 +12,33 @@ const LoginScreen = ({ navigation }) => {
 
   const { login } = useAuth();
 
-  const handleLogin = async () => {
-    try {
-      const result = await loginUser(email, password);
+const handleLogin = async () => {
+  try {
+    const result = await loginUser(email, password);
 
-      console.log('Login Status:', result.status);
-      console.log('Login Response:', result.data);
+    // Standard API response ke according
+    const { token, user } = result.data.data;
 
-      if (result.status === 200) {
-        await login(result.data.token, result.data.user);
+    // AuthContext me login
+    await login(token, user);
 
-        Alert.alert('Success', 'Login successful!');
-      } else {
-        Alert.alert(
-          'Login Failed',
-          result.data.message || 'Something went wrong',
-        );
-      }
-    } catch (error) {
-      console.log('Login Error:', error);
+    Alert.alert("Success", "Login successful!");
 
-      Alert.alert('Error', 'Unable to connect to server');
+  } catch (error) {
+    console.log("LOGIN ERROR:", error);
+
+    // Backend validation / login errors
+    if (error.data?.message) {
+      Alert.alert("Login Failed", error.data.message);
+    } else {
+      // Network ya unknown error
+      Alert.alert(
+        "Error",
+        "Unable to connect to server. Please try again."
+      );
     }
-  };
+  }
+};
 
   return (
     <View style={styles.container}>
