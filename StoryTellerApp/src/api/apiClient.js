@@ -12,6 +12,18 @@ const apiClient = async (endpoint, options = {}) => {
 
     const data = await response.json();
 
+    // HTTP error handling
+    if (!response.ok) {
+      const error = new Error(
+        data.message || "Something went wrong"
+      );
+
+      error.status = response.status;
+      error.data = data;
+
+      throw error;
+    }
+
     return {
       status: response.status,
       data,
